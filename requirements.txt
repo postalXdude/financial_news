@@ -1,0 +1,4 @@
+django==4.0.4
+djangorestframework==3.13.1
+djangorestframework-yaml==2.0.0
+djangorestframework-simplejwt==5.1.0
