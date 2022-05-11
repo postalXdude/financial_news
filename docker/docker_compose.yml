@@ -2,10 +2,11 @@ version: '3.5'
 
 services:
   financial_news:
-# TODO(Nikola): For some reason it is not detected.
-#    build: ../Dockerfile
+    build:
+      context: ..
     image: financial_news_server
     network_mode: "host"
+    command: python manage.py runserver
     ports:
       - "8000:8000"
     environment:
@@ -40,6 +41,30 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
+
+  celery_worker:
+    build:
+      context: ..
+    image: financial_news_server
+    network_mode: "host"
+    depends_on:
+      - postgres
+      - redis
+    command: "celery -A core worker -l INFO"
+    restart: "on-failure"
+
+
+  celery_beat:
+    build:
+      context: ..
+    image: financial_news_server
+    network_mode: "host"
+    depends_on:
+      - postgres
+      - redis
+      - celery_worker
+    command: "celery -A core beat -l INFO"
+    restart: "on-failure"
 
 volumes:
   postgres_data: {}
