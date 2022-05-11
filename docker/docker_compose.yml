@@ -1,9 +1,30 @@
 version: '3.5'
 
 services:
-#  financial_news:
-#    image: ???
-#    TODO
+  financial_news:
+# TODO(Nikola): For some reason it is not detected.
+#    build: ../Dockerfile
+    image: financial_news_server
+    network_mode: "host"
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - redis
+      - postgres
+
+  redis:
+    image: redis:7-alpine
+    restart: "always"
+    hostname: redis
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
 
   # Docker container running Postgres DB.
   postgres:
@@ -15,13 +36,13 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
-#volumes:
-#  postgres_data: {}
+volumes:
+  postgres_data: {}
 
 networks:
   default:
