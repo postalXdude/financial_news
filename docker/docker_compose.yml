@@ -9,6 +9,7 @@ services:
     command: python manage.py runserver
     ports:
       - "8000:8000"
+    # TODO(Nikola): Move env vars to one place.
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_DB=${POSTGRES_DB}

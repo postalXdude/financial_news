@@ -27,7 +27,7 @@ def get_rss_feed_for_symbol(request, symbol):
 
 @api_view(['POST'])
 @parser_classes([JSONParser])
-def store_new_symbols(request):
+def store_symbols(request):
     """
     Store new symbols that will be used for fetching Yahoo RSS feeds.
     """

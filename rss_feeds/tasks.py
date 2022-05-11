@@ -74,4 +74,4 @@ def fetch_rss_from_source_for_symbol(symbol):
     news_serializer = NewsSerializer(data=items, many=True)
     news_serializer.is_valid(raise_exception=True)
     news_serializer.save()
-    # TODO(Nikola): Skip already saved news?
+    # TODO(Nikola): Skip already saved news and make it flexible...
