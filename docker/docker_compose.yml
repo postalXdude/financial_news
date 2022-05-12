@@ -26,6 +26,7 @@ services:
       - postgres
     ports:
       - "8000:8000"
+    restart: "on-failure"
 
   redis:
     image: redis:7-alpine
@@ -41,12 +42,12 @@ services:
   postgres:
     image: postgres:14-alpine
     container_name: postgres_container
-    restart: "no"
     environment: *common-variables
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    restart: "on-failure"
 
   celery_worker:
     image: financial_news
