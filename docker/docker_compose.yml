@@ -1,6 +1,13 @@
 version: '3.5'
 
 x-common-variables: &common-variables
+  CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+  CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+  CELERY_ACCEPT_CONTENT: ${CELERY_ACCEPT_CONTENT}
+  CELERY_TASK_SERIALIZER: ${CELERY_TASK_SERIALIZER}
+  CELERY_RESULT_SERIALIZER: ${CELERY_RESULT_SERIALIZER}
+  CELERY_TIMEZONE: ${CELERY_TIMEZONE}
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
   POSTGRES_HOST: ${POSTGRES_HOST}
   POSTGRES_DB: ${POSTGRES_DB}
   POSTGRES_PORT: ${POSTGRES_PORT}
@@ -9,29 +16,31 @@ x-common-variables: &common-variables
 
 services:
   financial_news:
-    build:
-      context: ..
-    image: financial_news_server
+    image: financial_news
+    container_name: financial_news_container
     network_mode: "host"
-    command: /bin/sh -c "sleep 1 && python manage.py migrate && python manage.py runserver"
-    ports:
-      - "8000:8000"
     environment: *common-variables
+    command: /bin/sh -c "sleep 1 && python manage.py migrate && python manage.py runserver"
     depends_on:
       - redis
       - postgres
+    ports:
+      - "8000:8000"
 
   redis:
     image: redis:7-alpine
+    container_name: redis_container
     restart: "always"
     hostname: redis
+    volumes:
+      - redis_data:/var/lib/redis/data
     command: redis-server --save 60 1 --loglevel warning
     ports:
       - "6379:6379"
 
-  # Docker container running Postgres DB.
   postgres:
     image: postgres:14-alpine
+    container_name: postgres_container
     restart: "no"
     environment: *common-variables
     volumes:
@@ -40,31 +49,31 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
   celery_worker:
-    build:
-      context: ..
-    image: financial_news_server
+    image: financial_news
+    container_name: celery_worker_container
     network_mode: "host"
     environment: *common-variables
+    command: "celery -A core worker -l INFO"
     depends_on:
       - postgres
       - redis
-    command: "celery -A core worker -l INFO"
     restart: "on-failure"
 
 
   celery_beat:
-    build:
-      context: ..
-    image: financial_news_server
+    image: financial_news
+    container_name: celery_beat_container
     network_mode: "host"
+    environment: *common-variables
+    command: "celery -A core beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     depends_on:
       - postgres
       - redis
       - celery_worker
-    command: "celery -A core beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     restart: "on-failure"
 
 volumes:
+  redis_data: {}
   postgres_data: {}
 
 networks:

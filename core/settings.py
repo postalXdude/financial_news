@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 import os
+import json
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&e+v66e)9$@f$o^ks@00a1=i26g4v)tc&ni$6)p*pv5zi)-i)_'
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -80,27 +81,21 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'financial_news',
-        'USER': 'admin',
-        'PASSWORD': 'admin',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-        # 'NAME': os.environ['POSTGRES_DB'],
-        # 'USER': os.environ['POSTGRES_USER'],
-        # 'PASSWORD': os.environ['POSTGRES_PASSWORD'],
-        # 'HOST': os.environ['POSTGRES_HOST'],
-        # 'PORT': os.environ['POSTGRES_PORT'],
+        'NAME': os.environ['POSTGRES_DB'],
+        'USER': os.environ['POSTGRES_USER'],
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'HOST': os.environ['POSTGRES_HOST'],
+        'PORT': os.environ['POSTGRES_PORT'],
     }
 }
 
 # Celery
-
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+CELERY_BROKER_URL = os.environ["CELERY_BROKER_URL"]
+CELERY_RESULT_BACKEND = os.environ["CELERY_RESULT_BACKEND"]
+CELERY_ACCEPT_CONTENT = json.loads(os.environ["CELERY_ACCEPT_CONTENT"])
+CELERY_TASK_SERIALIZER = os.environ["CELERY_TASK_SERIALIZER"]
+CELERY_RESULT_SERIALIZER = os.environ["CELERY_RESULT_SERIALIZER"]
+CELERY_TIMEZONE = os.environ["CELERY_TIMEZONE"]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
