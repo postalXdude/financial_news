@@ -1,21 +1,22 @@
 version: '3.5'
 
+x-common-variables: &common-variables
+  POSTGRES_HOST: ${POSTGRES_HOST}
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_PORT: ${POSTGRES_PORT}
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
 services:
   financial_news:
     build:
       context: ..
     image: financial_news_server
     network_mode: "host"
-    command: python manage.py runserver
+    command: /bin/sh -c "sleep 1 && python manage.py migrate && python manage.py runserver"
     ports:
       - "8000:8000"
-    # TODO(Nikola): Move env vars to one place.
-    environment:
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    environment: *common-variables
     depends_on:
       - redis
       - postgres
@@ -32,12 +33,7 @@ services:
   postgres:
     image: postgres:14-alpine
     restart: "no"
-    environment:
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    environment: *common-variables
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -48,6 +44,7 @@ services:
       context: ..
     image: financial_news_server
     network_mode: "host"
+    environment: *common-variables
     depends_on:
       - postgres
       - redis
@@ -64,7 +61,7 @@ services:
       - postgres
       - redis
       - celery_worker
-    command: "celery -A core beat -l INFO"
+    command: "celery -A core beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     restart: "on-failure"
 
 volumes:
