@@ -1,0 +1,97 @@
+{
+	"info": {
+		"_postman_id": "1d8f5374-d3e9-4b9c-aa25-2692dcd26459",
+		"name": "Financial News",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get RSS Feeds for symbol",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/rss_feeds/symbols/AAPL",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"rss_feeds",
+						"symbols",
+						"AAPL"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Store New Symbols",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n        \"name\": \"AAPL\",\n        \"enabled\": true\n    },\n    {\n        \"name\": \"TWTR\",\n        \"enabled\": true\n    },\n    {\n        \"name\": \"GOLD\",\n        \"enabled\": true\n    },\n    {\n        \"name\": \"INTC\",\n        \"enabled\": true\n    }\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/rss_feeds/symbols",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"rss_feeds",
+						"symbols"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Trigger Periodical Sync",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"period\": \"seconds\",\n    \"every\": 5\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/rss_feeds/sync",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"rss_feeds",
+						"sync"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
