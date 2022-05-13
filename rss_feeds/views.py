@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework import generics
 from rest_framework.parsers import JSONParser
 from rest_framework.exceptions import NotFound
+from rest_framework.pagination import PageNumberPagination
 
 from .models import Symbols, News
 from .serializers import NewsSerializer, SymbolsSerializer
@@ -26,10 +27,14 @@ def get_rss_feed_for_symbol(request, symbol):
     Get RSS feeds from Yahoo that are stored db for desired symbol.
     """
     try:
-        news = News.objects.get(symbol=symbol)
+        Symbols.objects.get(name=symbol)
     except Symbols.DoesNotExist:
-        return NotFound(f'Symbol `{symbol}` does not exists!')
-    return JsonResponse(news, status=200, safe=False)
+        raise NotFound(f'Symbol `{symbol}` does not exists!')
+    news_queryset = News.objects.filter(symbol=symbol)
+    paginator = PageNumberPagination()
+    paginated_news = paginator.paginate_queryset(news_queryset, request)
+    news_serializer = NewsSerializer(paginated_news, many=True)
+    return paginator.get_paginated_response(news_serializer.data)
 
 
 @api_view(['POST'])
