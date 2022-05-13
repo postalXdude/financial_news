@@ -10,9 +10,9 @@ on:
       # Comment this out to run when committing on the branch.
       - main
   workflow_dispatch:
-  schedule:
-    # Run this once a day even if there are no commit.
-    - cron:  '0 0 */1 * *'
+#  schedule:
+#    # Run this once a day even if there are no commit.
+#    - cron:  '0 0 */1 * *'
 
 jobs:
 
